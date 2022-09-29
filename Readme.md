@@ -1,6 +1,4 @@
-# Starter für das LF08 Projekt
-
-Erstellen Sie einen Fork dieses Projektes auf Github. Wählen Sie einen Namen und passen Sie diesen auch in der pom.xml in Zeile 12, 14 und 15 an.
+# Project Managment System
 
 ## Requirements
 * Docker https://docs.docker.com/get-docker/
