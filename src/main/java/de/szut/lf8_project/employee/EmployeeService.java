@@ -28,7 +28,7 @@ public class EmployeeService {
      * @param qualification Qualification die abgefragt werden soll
      * @return boolean ob Employee qualification besitzt
      */
-    public boolean isEmployeeOwningCertainQualification(int id, String qualification, String bearerToken) {
+    public boolean isEmployeeOwningCertainQualification(long id, String qualification, String bearerToken) {
         EmployeeDto dto = getEmployee(id, bearerToken);
         if (qualificationService.isQualificationExisting(qualification, bearerToken)) {
             return Arrays.asList(dto.getSkillSet()).contains(qualification);
@@ -42,7 +42,7 @@ public class EmployeeService {
      *
      * @throws ResourceNotFoundException wenn Mitarbeiter nicht existiert
      */
-    public EmployeeDto getEmployee(int id, String bearerToken) {
+    public EmployeeDto getEmployee(long id, String bearerToken) {
         RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL + "/{id}", id)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + bearerToken).build();
