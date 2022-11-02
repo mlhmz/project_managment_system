@@ -1,7 +1,7 @@
 package de.szut.lf8_project.mapping;
 
-import de.szut.lf8_project.project.CreateProjectDto;
-import de.szut.lf8_project.project.Project;
+import de.szut.lf8_project.project.dto.CreateProjectDto;
+import de.szut.lf8_project.project.entities.Project;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,5 +1,7 @@
-package de.szut.lf8_project.project;
+package de.szut.lf8_project.project.services;
 
+import de.szut.lf8_project.project.repositories.ProjectRepository;
+import de.szut.lf8_project.project.entities.Project;
 import org.springframework.stereotype.Service;
 
 @Service

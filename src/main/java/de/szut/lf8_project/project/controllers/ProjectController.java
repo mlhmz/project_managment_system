@@ -1,8 +1,11 @@
-package de.szut.lf8_project.project;
+package de.szut.lf8_project.project.controllers;
 
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
+import de.szut.lf8_project.project.services.ProjectService;
+import de.szut.lf8_project.project.dto.CreateProjectDto;
+import de.szut.lf8_project.project.entities.Project;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
