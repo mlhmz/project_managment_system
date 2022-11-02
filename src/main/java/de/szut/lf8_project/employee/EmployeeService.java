@@ -1,11 +1,11 @@
 package de.szut.lf8_project.employee;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -37,22 +37,41 @@ public class EmployeeService {
         }
     }
 
+    public boolean isEmployeeExisting(long id, String bearerToken) {
+        try {
+            RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL + "/{id}", id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header("Authorization", bearerToken)
+                    .build();
+
+            ResponseEntity<EmployeeDto> employeeEntity =
+                    template.exchange(request, EmployeeDto.class);
+
+            return employeeEntity.getBody() != null;
+        } catch (HttpClientErrorException.NotFound ex) {
+            return false;
+        }
+
+    }
+
     /**
      * Holt Employee von Rest-Service
      *
      * @throws ResourceNotFoundException wenn Mitarbeiter nicht existiert
      */
     public EmployeeDto getEmployee(long id, String bearerToken) {
-        RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL + "/{id}", id)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + bearerToken).build();
+        try {
+            RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL + "/{id}", id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header("Authorization", bearerToken)
+                    .build();
 
-        ResponseEntity<EmployeeDto> employeeEntity =
-                template.exchange(request, EmployeeDto.class);
+            ResponseEntity<EmployeeDto> employeeEntity =
+                    template.exchange(request, EmployeeDto.class);
 
-        if (employeeEntity.getStatusCode() == HttpStatus.NOT_FOUND) {
+            return employeeEntity.getBody();
+        } catch (HttpClientErrorException.NotFound ex) {
             throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.", id));
         }
-        return employeeEntity.getBody();
     }
 }

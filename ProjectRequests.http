@@ -1,0 +1,11 @@
+POST http://localhost:8089/project
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "responsibleEmployeeId": 9,
+  "customerId": 1,
+  "comment": "Aloha!",
+  "startDate": "2021-07-01_11-11-11",
+  "plannedEndDate": "2022-10-13_11-11-11"
+}
