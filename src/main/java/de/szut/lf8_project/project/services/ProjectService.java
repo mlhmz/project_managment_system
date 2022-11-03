@@ -63,7 +63,7 @@ public class ProjectService {
      *
      * @param employeeId Der verantwortliche Mitarbeiter
      * @return Eine Liste mit Projekten in denen der Mitarbeiter eingebunden ist, falls Mitarbeiter in keinem Projekt
-     *  eingebunden ist null.
+     * eingebunden ist null.
      */
     public List<Project> readProjectsByResponsibleEmployeeId(long employeeId) {
         return this.repository.getProjectsByResponsibleEmployeeId(employeeId);
@@ -71,6 +71,7 @@ public class ProjectService {
 
     /**
      * Holt alle EmployeeIds von einem Projekt
+     *
      * @param projectId Die ProjektId dessen Employees geholt werden soll
      * @return Gibt Liste mit Ids von Mitarbeitern zurück
      */
