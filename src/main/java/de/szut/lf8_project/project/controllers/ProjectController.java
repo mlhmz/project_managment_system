@@ -3,6 +3,7 @@ package de.szut.lf8_project.project.controllers;
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
+import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.services.ProjectService;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.entities.Project;
@@ -68,5 +69,34 @@ public class ProjectController {
         return new ResponseEntity<>(projectService.createProject(
                 mappingService.mapCreateProjectDtoToProject(dto)
         ), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "updates a project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "updated project",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ChangeProjectDto.class))}),
+            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "not authorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "If the project id or the employee couldn't be found")}
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Project> updateProject(@RequestBody @Valid final ChangeProjectDto dto,
+                                                 @PathVariable Long id,
+                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+
+        Long responsibleEmployeeId = dto.getResponsibleEmployeeId();
+        if(responsibleEmployeeId != null){
+            if (employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
+                // TODO: Nötigen HATEOAS setzen
+            } else {
+                throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
+                        responsibleEmployeeId));
+            }
+        }
+
+        return new ResponseEntity<>(projectService.updateProject(dto, id), HttpStatus.OK);
     }
 }
