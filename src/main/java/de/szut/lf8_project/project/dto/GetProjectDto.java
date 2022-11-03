@@ -21,5 +21,5 @@ public class GetProjectDto {
 
     private LocalDateTime endDate;
 
-    private Set<Integer> employeeIds;
+    private Set<Long> employeeIds;
 }
