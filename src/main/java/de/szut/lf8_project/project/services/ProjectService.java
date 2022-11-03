@@ -26,7 +26,7 @@ public class ProjectService {
         if(optProject.isPresent()){
             return updateProjectData(dto, optProject.get());
         } else{
-            throw new ResourceNotFoundException("No Project was found for id" + id);
+            throw new ResourceNotFoundException(String.format("No Project was found for %d",id));
         }
     }
 
