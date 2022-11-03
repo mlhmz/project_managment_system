@@ -1,15 +1,17 @@
 package de.szut.lf8_project.project.dto;
 
+import de.szut.lf8_project.employee.EmployeeDto;
+import de.szut.lf8_project.employee.EmployeeReferenceDto;
 import lombok.Data;
+import org.springframework.hateoas.CollectionModel;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 public class GetProjectDto {
     private long id;
 
-    private long responsibleEmployeeId;
+    private EmployeeDto responsibleEmployeeId;
 
     private long customerId;
 
@@ -21,5 +23,5 @@ public class GetProjectDto {
 
     private LocalDateTime endDate;
 
-    private Set<Long> employeeIds;
+    private CollectionModel<EmployeeReferenceDto> employeeIds;
 }

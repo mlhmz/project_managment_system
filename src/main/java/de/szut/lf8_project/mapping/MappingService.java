@@ -1,13 +1,12 @@
 package de.szut.lf8_project.mapping;
 
-import de.szut.lf8_project.project.controllers.ProjectEmployee;
+import de.szut.lf8_project.employee.EmployeeReferenceModelAssembler;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,15 +35,12 @@ public class MappingService {
         dto.setId(project.getId());
         dto.setComment(project.getComment());
         dto.setCustomerId(project.getCustomerId());
-        dto.setResponsibleEmployeeId(project.getResponsibleEmployeeId());
         dto.setStartDate(project.getStartDate());
         dto.setPlannedEndDate(project.getPlannedEndDate());
         dto.setEndDate(project.getEndDate());
 
-        Set<Long> employeeIds = project.getEmployeeIds().stream()
-                .map(ProjectEmployee::getEmployeeId)
-                .collect(Collectors.toSet());
-        dto.setEmployeeIds(employeeIds);
+        EmployeeReferenceModelAssembler employeeReferenceModelAssembler = new EmployeeReferenceModelAssembler();
+        dto.setEmployeeIds(employeeReferenceModelAssembler.toCollectionModel(project.getEmployeeIds()));
 
         return dto;
     }
