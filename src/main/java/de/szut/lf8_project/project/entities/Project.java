@@ -1,5 +1,6 @@
 package de.szut.lf8_project.project.entities;
 
+import de.szut.lf8_project.customer.Customer;
 import de.szut.lf8_project.project.controllers.ProjectEmployee;
 import lombok.*;
 
@@ -12,7 +13,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Builder
 @Entity
 @Table(name = "project")
@@ -39,4 +39,7 @@ public class Project {
             fetch = FetchType.EAGER,
             mappedBy = "project")
     private Set<ProjectEmployee> employeeIds;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Customer customer;
 }

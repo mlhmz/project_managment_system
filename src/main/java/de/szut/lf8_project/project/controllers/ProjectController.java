@@ -1,5 +1,6 @@
 package de.szut.lf8_project.project.controllers;
 
+import de.szut.lf8_project.customer.CustomerService;
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
@@ -24,12 +25,15 @@ public class ProjectController {
     private final ProjectService projectService;
     private final MappingService mappingService;
     private final EmployeeService employeeService;
+    private final CustomerService customerService;
 
     public ProjectController(ProjectService projectService, MappingService mappingService,
-                             EmployeeService employeeService) {
+                             EmployeeService employeeService, CustomerService customerService) {
         this.projectService = projectService;
         this.mappingService = mappingService;
         this.employeeService = employeeService;
+        this.customerService = customerService;
+        // TODO: Abfrage ob der Kunde auch existiert bei erstellen des Projekts
     }
 
     /**
