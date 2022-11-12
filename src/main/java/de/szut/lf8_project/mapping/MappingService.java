@@ -1,16 +1,23 @@
 package de.szut.lf8_project.mapping;
 
+import de.szut.lf8_project.employee.EmployeeReferenceDto;
 import de.szut.lf8_project.employee.EmployeeReferenceModelAssembler;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class MappingService {
+    EmployeeReferenceModelAssembler employeeReferenceModelAssembler = new EmployeeReferenceModelAssembler();
+
     /**
      * Mappt erforderliche Informationen des {@link CreateProjectDto} zu {@link Project}
      */
@@ -24,7 +31,7 @@ public class MappingService {
                 .build();
     }
 
-    public List<GetProjectDto> mapProjectsToGetProjectDtos(List<Project> projects) {
+    public List<GetProjectDto> mapProjectsToGetProjectList(List<Project> projects) {
         return projects.stream()
                 .map(this::mapProjectToGetProjectDto)
                 .collect(Collectors.toList());
@@ -39,9 +46,29 @@ public class MappingService {
         dto.setPlannedEndDate(project.getPlannedEndDate());
         dto.setEndDate(project.getEndDate());
 
-        EmployeeReferenceModelAssembler employeeReferenceModelAssembler = new EmployeeReferenceModelAssembler();
-        dto.setEmployeeIds(employeeReferenceModelAssembler.toCollectionModel(project.getEmployeeIds()));
+        dto.setResponsibleEmployee(mapProjectEmployeeToEmployeeReference(
+                buildProjectEmployeeById(project.getResponsibleEmployeeId())
+        ));
+        dto.setEmployeeIds(mapProjectEmployeesToEmployeeReferences(project.getEmployeeIds()));
 
         return dto;
+    }
+
+    public CollectionModel<EmployeeReferenceDto> mapProjectEmployeesToEmployeeReferences(Set<ProjectEmployee> projectEmployees) {
+        if (projectEmployees != null && !projectEmployees.isEmpty()) {
+            return this.employeeReferenceModelAssembler.toCollectionModel(projectEmployees);
+        } else {
+            return CollectionModel.empty();
+        }
+    }
+
+    public EmployeeReferenceDto mapProjectEmployeeToEmployeeReference(ProjectEmployee employee) {
+        return this.employeeReferenceModelAssembler.toModel(employee);
+    }
+
+    private ProjectEmployee buildProjectEmployeeById(@NotNull long responsibleEmployeeId) {
+        ProjectEmployee projectEmployee = new ProjectEmployee();
+        projectEmployee.setEmployeeId(responsibleEmployeeId);
+        return projectEmployee;
     }
 }
