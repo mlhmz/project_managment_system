@@ -1,14 +1,14 @@
 package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
-import de.szut.lf8_project.project.controllers.ProjectEmployee;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.entities.Project;
 import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -70,17 +70,14 @@ public class ProjectService {
     }
 
     /**
-     * Holt alle EmployeeIds von einem Projekt
+     * Holt alle {@link ProjectEmployee} von einem Projekt
      *
      * @param projectId Die ProjektId dessen Employees geholt werden soll
      * @return Gibt Liste mit Ids von Mitarbeitern zurück
      */
-    public List<Long> getAllEmployeesIdsFromProject(long projectId) {
+    public Set<ProjectEmployee> readAllEmployeesFromProject(long projectId) {
         Project project = readProjectById(projectId);
-
-        return project.getEmployeeIds().stream()
-                .map(ProjectEmployee::getEmployeeId)
-                .collect(Collectors.toList());
+        return project.getEmployeeIds();
     }
 
 
