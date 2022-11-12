@@ -69,4 +69,19 @@ public class ProjectController {
                 mappingService.mapCreateProjectDtoToProject(dto)
         ), HttpStatus.CREATED);
     }
+
+    @PutMapping
+    public ResponseEntity<Project> addProjectEmployeeToProject(@RequestParam Long projectId, @RequestParam Long employeeId,
+                                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+
+        if(!employeeService.isEmployeeExisting(employeeId, token)) {
+            throw new ResourceNotFoundException(String.format("The Employee with the Id %d couldn't be found", employeeId));
+        }
+
+        Project project = projectService.addProjectEmployeeToProject(projectId, employeeId);
+
+        // TODO: Nach Einbau von GetProjectDto ergänzen
+
+        return new ResponseEntity<>(project, HttpStatus.OK);
+    }
 }
