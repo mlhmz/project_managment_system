@@ -1,6 +1,6 @@
 package de.szut.lf8_project.employee;
 
-import de.szut.lf8_project.project.controllers.ProjectEmployee;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
