@@ -2,6 +2,7 @@ package de.szut.lf8_project.mapping;
 
 import de.szut.lf8_project.employee.EmployeeReferenceDto;
 import de.szut.lf8_project.employee.EmployeeReferenceModelAssembler;
+import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
@@ -60,6 +61,10 @@ public class MappingService {
         } else {
             return CollectionModel.empty();
         }
+    }
+
+    public GetEmployeeReferencesDto mapProjectEmployeesToGetEmployeeReferencesDto(Set<ProjectEmployee> projectEmployees) {
+        return new GetEmployeeReferencesDto(mapProjectEmployeesToEmployeeReferences(projectEmployees));
     }
 
     public EmployeeReferenceDto mapProjectEmployeeToEmployeeReference(ProjectEmployee employee) {
