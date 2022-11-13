@@ -32,11 +32,11 @@ public class ProjectService {
     }
 
     /**
-     * Holt ein Projekt mit einer bestimmten id
+     * Gets a {@link Project} with a certain id
      *
-     * @param projectId die eindeutige Id des Projektes
-     * @return das gesuchte Projekt
-     * @throws ResourceNotFoundException Wenn gesuchtes Projekt nicht existiert
+     * @param projectId unique id of the Project {@link Project#getId()}
+     * @return The project with the unique id
+     * @throws ResourceNotFoundException thrown when the project doesn't exist
      */
     public Project readProjectById(long projectId) {
         Optional<Project> project = this.repository.findById(projectId);
@@ -49,31 +49,31 @@ public class ProjectService {
     }
 
     /**
-     * Holt alle Projekte mit der Id eines Kunden
+     * Gets all Project where a customer is involved
      *
-     * @param customerId Id des Kunden
-     * @return Eine Liste mit Projekten, falls Kunde nicht eingebunden ist leer
+     * @param customerId The customers id
+     * @return A {@link List<Project>} with the projects.
      */
     public List<Project> readProjectsByCustomerId(long customerId) {
         return this.repository.getProjectsByCustomerId(customerId);
     }
 
     /**
-     * Holt alle Projekte mit einem verantwortlichen Mitarbeiter
+     * Gets all {@link Project} of a responsible Employee ({@link Project#getEmployeeIds()})
      *
-     * @param employeeId Der verantwortliche Mitarbeiter
-     * @return Eine Liste mit Projekten in denen der Mitarbeiter eingebunden ist, falls Mitarbeiter in keinem Projekt
-     * eingebunden ist null.
+     * @param employeeId The responsible Employee
+     * @return {@link List<Project>} of Projects in which the Employee ({@link Project#getResponsibleEmployeeId()})
+     * is responsive for. If the employee is not responsible for any project, null will be returned
      */
     public List<Project> readProjectsByResponsibleEmployeeId(long employeeId) {
         return this.repository.getProjectsByResponsibleEmployeeId(employeeId);
     }
 
     /**
-     * Holt alle {@link ProjectEmployee} von einem Projekt
+     * Gets {@link Set<ProjectEmployee>} of a {@link Project}
      *
-     * @param projectId Die ProjektId dessen Employees geholt werden soll
-     * @return Gibt Liste mit Ids von Mitarbeitern zurück
+     * @param projectId The {@link Project}'s id which employees be received
+     * @return Returns a list with id's of every employee
      */
     public Set<ProjectEmployee> readAllEmployeesFromProject(long projectId) {
         Project project = readProjectById(projectId);

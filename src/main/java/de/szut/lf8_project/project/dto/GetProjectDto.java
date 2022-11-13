@@ -6,6 +6,9 @@ import org.springframework.hateoas.CollectionModel;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data-Transfer-Object of the Project as API Output for e.g. Get-Requests or Callbacks for Post-Requests
+ */
 @Data
 public class GetProjectDto {
     private long id;

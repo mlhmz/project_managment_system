@@ -8,6 +8,9 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Assembler for HATEOAS
+ */
 public class EmployeeReferenceModelAssembler implements RepresentationModelAssembler<ProjectEmployee, EmployeeReferenceDto> {
     @Override
     public EmployeeReferenceDto toModel(ProjectEmployee entity) {
