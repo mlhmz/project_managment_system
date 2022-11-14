@@ -1,6 +1,5 @@
 package de.szut.lf8_project.project.entities;
 
-import de.szut.lf8_project.project.controllers.ProjectEmployee;
 import lombok.*;
 
 import javax.persistence.*;
