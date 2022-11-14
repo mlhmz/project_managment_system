@@ -1,25 +1,27 @@
 package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_project.mapping.MappingService;
 import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.repositories.ProjectRepository;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.entities.Project;
-import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class ProjectService {
 
     private final ProjectRepository repository;
+    // TODO: SEVERE Remove
+    private final MappingService mapper;
 
-    public ProjectService(ProjectRepository repository) {
+    public ProjectService(ProjectRepository repository, MappingService mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     public Project createProject(Project project) {
@@ -30,23 +32,10 @@ public class ProjectService {
         Optional<Project> optProject = this.repository.findById(id);
 
         if (optProject.isPresent()) {
-            return this.repository.save(updateProjectData(dto, optProject.get()));
+            return this.repository.save(mapper.mapUpdateProjectDtoIntoProject(dto, optProject.get()));
         } else {
             throw new ResourceNotFoundException(String.format("No Project was found for %d", id));
         }
-    }
-
-    public Project updateProjectData(ChangeProjectDto dto, Project project) {
-        if (!dto.getComment().isEmpty()) {
-            project.setComment(dto.getComment());
-        }
-        if (dto.getPlannedEndDate() != null) {
-            project.setPlannedEndDate(dto.getPlannedEndDate());
-        }
-        if (dto.getResponsibleEmployeeId() != null) {
-            project.setResponsibleEmployeeId(dto.getResponsibleEmployeeId());
-        }
-        return project;
     }
 
     /**

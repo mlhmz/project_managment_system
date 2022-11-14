@@ -3,6 +3,7 @@ package de.szut.lf8_project.mapping;
 import de.szut.lf8_project.employee.EmployeeReferenceDto;
 import de.szut.lf8_project.employee.EmployeeReferenceModelAssembler;
 import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
+import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
@@ -89,6 +90,27 @@ public class MappingService {
      */
     public GetEmployeeReferencesDto mapProjectEmployeesToGetEmployeeReferencesDto(Set<ProjectEmployee> projectEmployees) {
         return new GetEmployeeReferencesDto(mapProjectEmployeesToEmployeeReferences(projectEmployees));
+    }
+
+
+    /**
+     * Maps a {@link ChangeProjectDto} into a {@link Project}
+     *
+     * @param dto DTO with optional Data
+     * @param project Project which should recieve the Update
+     * @return updated Project
+     */
+    public Project mapUpdateProjectDtoIntoProject(ChangeProjectDto dto, Project project) {
+        if (!dto.getComment().isEmpty()) {
+            project.setComment(dto.getComment());
+        }
+        if (dto.getPlannedEndDate() != null) {
+            project.setPlannedEndDate(dto.getPlannedEndDate());
+        }
+        if (dto.getResponsibleEmployeeId() != null) {
+            project.setResponsibleEmployeeId(dto.getResponsibleEmployeeId());
+        }
+        return project;
     }
 
     /**
