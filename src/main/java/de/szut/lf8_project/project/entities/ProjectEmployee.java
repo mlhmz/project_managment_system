@@ -1,6 +1,5 @@
-package de.szut.lf8_project.project.controllers;
+package de.szut.lf8_project.project.entities;
 
-import de.szut.lf8_project.project.entities.Project;
 import lombok.Getter;
 import lombok.Setter;
 
