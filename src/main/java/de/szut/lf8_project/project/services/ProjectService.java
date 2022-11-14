@@ -17,10 +17,21 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
+    /**
+     * Deletes project by id
+     *
+     * @param id unique project id
+     */
     public void deleteProject(long id) {
         this.repository.deleteById(id);
     }
 
+    /**
+     * Checks if the Project exists
+     *
+     * @param id unique project id
+     * @return boolean if project is existing
+     */
     public boolean isProjectExisting(long id) {
         return this.repository.existsById(id);
     }
