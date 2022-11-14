@@ -36,7 +36,7 @@ public class ProjectService {
         }
     }
 
-    private Project updateProjectData(ChangeProjectDto dto, Project project) {
+    public Project updateProjectData(ChangeProjectDto dto, Project project) {
         if (!dto.getComment().isEmpty()) {
             project.setComment(dto.getComment());
         }
