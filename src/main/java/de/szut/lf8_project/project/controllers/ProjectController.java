@@ -1,6 +1,7 @@
 package de.szut.lf8_project.project.controllers;
 
 import de.szut.lf8_project.employee.EmployeeService;
+import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
 import de.szut.lf8_project.project.services.ProjectService;
@@ -70,8 +71,18 @@ public class ProjectController {
         ), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Deletes a project by its unique id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Deleted project"),
+            @ApiResponse(responseCode = "401", description = "Project doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
     @DeleteMapping("/{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @ResponseStatus(code = HttpStatus.OK)
     public void deleteProjectById(@PathVariable Long id) {
         if (projectService.isProjectExisting(id)) {
             projectService.deleteProject(id);
