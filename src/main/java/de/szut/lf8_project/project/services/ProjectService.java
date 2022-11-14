@@ -21,14 +21,12 @@ public class ProjectService {
     }
 
     /**
-     * Commits a Project Entity
-     * Updates it, if it already exists or creates it if
-     * it doesn't.
+     * Saves a Project Entity and creates it, if it doesn't exist on save
      *
-     * @param project Project to commit
-     * @return Commited project with created / updated Data
+     * @param project Entity to commit
+     * @return Saved project with created / updated Data
      */
-    public Project commitProject(Project project) {
+    public Project saveProject(Project project) {
         return this.repository.save(project);
     }
 

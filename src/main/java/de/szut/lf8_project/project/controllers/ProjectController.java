@@ -71,7 +71,7 @@ public class ProjectController {
                     responsibleEmployeeId));
         }
 
-        Project createdProject = projectService.commitProject(project);
+        Project createdProject = projectService.saveProject(project);
         return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(createdProject), HttpStatus.CREATED);
     }
 
@@ -213,7 +213,7 @@ public class ProjectController {
 
         Project project = mappingService.mapUpdateProjectDtoIntoProject(dto, projectService.readProjectById(id));
 
-        return new ResponseEntity<>(projectService.commitProject(project), HttpStatus.OK);
+        return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.OK);
     }
 
     @Operation(summary = "Deletes a project by its unique id")
