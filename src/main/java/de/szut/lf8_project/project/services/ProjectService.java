@@ -1,14 +1,8 @@
 package de.szut.lf8_project.project.services;
 
-import de.szut.lf8_project.employee.EmployeeDto;
-import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
-import de.szut.lf8_project.project.repositories.ProjectRepository;
 import de.szut.lf8_project.project.entities.Project;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class ProjectService {
