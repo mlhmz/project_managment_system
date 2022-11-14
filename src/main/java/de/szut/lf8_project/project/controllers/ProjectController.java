@@ -187,4 +187,24 @@ public class ProjectController {
         Project project = projectService.readProjectById(id);
         return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(project), HttpStatus.OK);
     }
+
+    @Operation(summary = "Deletes a project by its unique id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Deleted project"),
+            @ApiResponse(responseCode = "401", description = "Project doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @DeleteMapping("/{id}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void deleteProjectById(@PathVariable Long id) {
+        if (projectService.isProjectExisting(id)) {
+            projectService.deleteProject(id);
+        } else {
+            throw new ResourceNotFoundException("The Project with the id %d couldn't be found ");
+        }
+    }
 }

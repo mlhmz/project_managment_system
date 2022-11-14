@@ -12,6 +12,7 @@ import java.util.Set;
 
 @Service
 public class ProjectService {
+
     private final ProjectRepository repository;
 
     public ProjectService(ProjectRepository repository) {
@@ -23,6 +24,14 @@ public class ProjectService {
     }
 
     /**
+     * Deletes project by id
+     *
+     * @param id unique project id
+     */
+    public void deleteProject(long id) {
+        this.repository.deleteById(id);
+    }
+  
      * Holt alle Projekte
      *
      * @return alle Projekte die in der Datenbank existieren
@@ -80,5 +89,13 @@ public class ProjectService {
         return project.getEmployeeIds();
     }
 
-
+    /**
+     * Checks if the Project exists
+     *
+     * @param id unique project id
+     * @return boolean if project is existing
+     */
+    public boolean isProjectExisting(long id) {
+        return this.repository.existsById(id);
+    }
 }
