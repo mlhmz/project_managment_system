@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 public class ChangeProjectDto {
 
+    @Range(min = 1)
     private Long responsibleEmployeeId;
 
     @Size(max = 150, message = "The comment shouldn't exceed 150 characters")
