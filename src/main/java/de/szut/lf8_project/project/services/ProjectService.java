@@ -1,13 +1,14 @@
 package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_project.mapping.MappingService;
+import de.szut.lf8_project.project.repositories.ProjectRepository;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.entities.Project;
-import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -15,11 +16,17 @@ public class ProjectService {
 
     private final ProjectRepository repository;
 
-    public ProjectService(ProjectRepository repository) {
+    public ProjectService(ProjectRepository repository, MappingService mapper) {
         this.repository = repository;
     }
 
-    public Project createProject(Project project) {
+    /**
+     * Saves a Project Entity and creates it, if it doesn't exist on save
+     *
+     * @param project Entity to commit
+     * @return Saved project with created / updated Data
+     */
+    public Project saveProject(Project project) {
         return this.repository.save(project);
     }
 
@@ -31,7 +38,8 @@ public class ProjectService {
     public void deleteProject(long id) {
         this.repository.deleteById(id);
     }
-  
+
+    /**
      * Holt alle Projekte
      *
      * @return alle Projekte die in der Datenbank existieren

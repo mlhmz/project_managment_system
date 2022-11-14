@@ -5,6 +5,7 @@ import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
 import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
+import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
@@ -70,7 +71,7 @@ public class ProjectController {
                     responsibleEmployeeId));
         }
 
-        Project createdProject = projectService.createProject(project);
+        Project createdProject = projectService.saveProject(project);
         return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(createdProject), HttpStatus.CREATED);
     }
 
@@ -186,6 +187,33 @@ public class ProjectController {
     public ResponseEntity<GetProjectDto> getProjectById(@PathVariable long id) {
         Project project = projectService.readProjectById(id);
         return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(project), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Updates a project with its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Updated project",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ChangeProjectDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Project or employee couldn't be found")}
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Project> updateProject(@RequestBody @Valid final ChangeProjectDto dto,
+                                                 @PathVariable Long id,
+                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        Long responsibleEmployeeId = dto.getResponsibleEmployeeId();
+
+        if(responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)){
+            throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
+                    responsibleEmployeeId));
+        }
+
+        Project project = mappingService.mapUpdateProjectDtoIntoProject(dto, projectService.readProjectById(id));
+
+        return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.OK);
     }
 
     @Operation(summary = "Deletes a project by its unique id")
