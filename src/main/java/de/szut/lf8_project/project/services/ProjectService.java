@@ -2,7 +2,6 @@ package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
-import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.repositories.ProjectRepository;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.entities.Project;
@@ -16,26 +15,21 @@ import java.util.Set;
 public class ProjectService {
 
     private final ProjectRepository repository;
-    // TODO: SEVERE Remove
-    private final MappingService mapper;
 
     public ProjectService(ProjectRepository repository, MappingService mapper) {
         this.repository = repository;
-        this.mapper = mapper;
     }
 
-    public Project createProject(Project project) {
+    /**
+     * Commits a Project Entity
+     * Updates it, if it already exists or creates it if
+     * it doesn't.
+     *
+     * @param project Project to commit
+     * @return Commited project with created / updated Data
+     */
+    public Project commitProject(Project project) {
         return this.repository.save(project);
-    }
-
-    public Project updateProject(ChangeProjectDto dto, Long id) {
-        Optional<Project> optProject = this.repository.findById(id);
-
-        if (optProject.isPresent()) {
-            return this.repository.save(mapper.mapUpdateProjectDtoIntoProject(dto, optProject.get()));
-        } else {
-            throw new ResourceNotFoundException(String.format("No Project was found for %d", id));
-        }
     }
 
     /**
