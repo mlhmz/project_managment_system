@@ -26,29 +26,29 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
-    public Project updateProject(ChangeProjectDto dto, Long id){
+    public Project updateProject(ChangeProjectDto dto, Long id) {
         Optional<Project> optProject = this.repository.findById(id);
 
-        if(optProject.isPresent()){
-            return updateProjectData(dto, optProject.get());
-        } else{
-            throw new ResourceNotFoundException(String.format("No Project was found for %d",id));
+        if (optProject.isPresent()) {
+            return this.repository.save(updateProjectData(dto, optProject.get()));
+        } else {
+            throw new ResourceNotFoundException(String.format("No Project was found for %d", id));
         }
     }
 
     private Project updateProjectData(ChangeProjectDto dto, Project project) {
-        if(!dto.getComment().isEmpty()){
+        if (!dto.getComment().isEmpty()) {
             project.setComment(dto.getComment());
         }
-        if(dto.getPlannedEndDate() != null){
+        if (dto.getPlannedEndDate() != null) {
             project.setPlannedEndDate(dto.getPlannedEndDate());
         }
-        if(dto.getResponsibleEmployeeId() != null){
+        if (dto.getResponsibleEmployeeId() != null) {
             project.setResponsibleEmployeeId(dto.getResponsibleEmployeeId());
         }
-        return this.repository.save(project);
+        return project;
     }
-    
+
     /**
      * Deletes project by id
      *
@@ -57,7 +57,8 @@ public class ProjectService {
     public void deleteProject(long id) {
         this.repository.deleteById(id);
     }
-  
+
+    /**
      * Holt alle Projekte
      *
      * @return alle Projekte die in der Datenbank existieren
