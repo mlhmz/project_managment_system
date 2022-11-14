@@ -72,12 +72,11 @@ public class ProjectController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void deleteProjectById(@PathVariable Long id){
-
-        if(projectService.isProjectExisting(id)){
-           projectService.deleteProject(id);
-        }else {
+    public void deleteProjectById(@PathVariable Long id) {
+        if (projectService.isProjectExisting(id)) {
+            projectService.deleteProject(id);
+        } else {
             throw new ResourceNotFoundException("The Project with the id %d couldn't be found ");
         }
-        }
+    }
 }

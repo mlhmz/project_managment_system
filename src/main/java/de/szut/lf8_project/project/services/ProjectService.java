@@ -17,7 +17,11 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
-    public void deleteProject(long id){ this.repository.deleteById(id);}
+    public void deleteProject(long id) {
+        this.repository.deleteById(id);
+    }
 
-    public boolean isProjectExisting(long id){return this.repository.existsById(id);}
+    public boolean isProjectExisting(long id) {
+        return this.repository.existsById(id);
+    }
 }
