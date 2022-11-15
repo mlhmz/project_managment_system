@@ -29,6 +29,13 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
+    /**
+     * Adds {@link ProjectEmployee} to actual {@link Project} and saves it
+     *
+     * @param project The {@link Project} entity that the {@link ProjectEmployee} shall be added to
+     * @param projectEmployee The {@link ProjectEmployee} to be added
+     * @return The saved {@link Project} with the added {@link ProjectEmployee}
+     */
     public Project addProjectEmployeeToProject(Project project, ProjectEmployee projectEmployee){
         project.getEmployeeIds().add(projectEmployee);
         return saveProject(project);
