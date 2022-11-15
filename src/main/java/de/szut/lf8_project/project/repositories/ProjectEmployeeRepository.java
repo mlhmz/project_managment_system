@@ -1,6 +1,6 @@
 package de.szut.lf8_project.project.repositories;
 
-import de.szut.lf8_project.project.controllers.ProjectEmployee;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
