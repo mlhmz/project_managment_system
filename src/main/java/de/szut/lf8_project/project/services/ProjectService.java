@@ -31,7 +31,7 @@ public class ProjectService {
 
     public Project addProjectEmployeeToProject(Project project, ProjectEmployee projectEmployee){
         project.getEmployeeIds().add(projectEmployee);
-        return this.repository.save(project);
+        return saveProject(project);
     }
 
     /**
