@@ -61,7 +61,7 @@ public class MappingService {
         dto.setEndDate(project.getEndDate());
 
         dto.setResponsibleEmployee(mapProjectEmployeeToEmployeeReference(
-                buildProjectEmployeeById(project.getResponsibleEmployeeId())
+                buildProjectEmployee(project.getResponsibleEmployeeId())
         ));
         dto.setEmployeeIds(mapProjectEmployeesToEmployeeReferences(project.getEmployeeIds()));
 
@@ -125,13 +125,26 @@ public class MappingService {
 
     /**
      * Builds a ProjectEmployee with an Employee ID
+     * Overload of {@link #buildProjectEmployee(long, Project)}
      *
      * @param employeeId Employee ID to put into the ProjectEmployee
      * @return ProjectEmployee with ID
      */
-    private ProjectEmployee buildProjectEmployeeById(@NotNull long employeeId) {
+    public ProjectEmployee buildProjectEmployee(@NotNull long employeeId) {
+        return buildProjectEmployee(employeeId, null);
+    }
+
+    /**
+     * Builds a {@link ProjectEmployee} with an Employee ID and a {@link Project}
+     *
+     * @param employeeId Employee ID to put into the {@link ProjectEmployee}
+     * @param project actual Project entity to put into the {@link ProjectEmployee}
+     * @return {@link ProjectEmployee} Object
+     */
+    public ProjectEmployee buildProjectEmployee(@NotNull long employeeId, Project project) {
         ProjectEmployee projectEmployee = new ProjectEmployee();
         projectEmployee.setEmployeeId(employeeId);
+        projectEmployee.setProject(project);
         return projectEmployee;
     }
 }
