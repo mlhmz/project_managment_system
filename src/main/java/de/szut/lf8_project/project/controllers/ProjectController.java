@@ -57,12 +57,12 @@ public class ProjectController {
             )}
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        consumes = "application/json",
-        produces = "application/hal+json"
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/hal+json"
     )
     public ResponseEntity<GetProjectDto> createProject(@RequestBody @Valid final CreateProjectDto dto,
-                                                 @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) {
+                                                       @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) {
         Project project = mappingService.mapCreateProjectDtoToProject(dto);
 
         long responsibleEmployeeId = dto.getResponsibleEmployeeId();
@@ -111,7 +111,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Responsible Employee couldn't be found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             value = "/responsible/{employeeId}",
@@ -155,7 +155,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             method = RequestMethod.GET,
@@ -177,7 +177,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project couldn't be found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             value = "/{id}",
@@ -206,7 +206,7 @@ public class ProjectController {
                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         Long responsibleEmployeeId = dto.getResponsibleEmployeeId();
 
-        if(responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)){
+        if (responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
             throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
                     responsibleEmployeeId));
         }
@@ -251,16 +251,15 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "If the project or the employee could't be found")}
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @RequestBody long employeeId,
-                                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(this.projectService.isEmployeeInvolvedInProject(id,employeeId)){
-            if(this.projectService.deleteEmployeeFromProject(id,employeeId)){
+    public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @RequestBody long employeeId) {
+        if (this.projectService.isEmployeeInvolvedInProject(id, employeeId)) {
+            if (this.projectService.deleteEmployeeFromProject(id, employeeId)) {
                 return new ResponseEntity<>(HttpStatus.OK);
-            }else{
+            } else {
                 throw new RuntimeException(String.format("Something went wrong in the deletion process for " +
-                                "project %d and employee %d", id, employeeId));
+                        "project %d and employee %d", id, employeeId));
             }
-        }else{
+        } else {
             throw new ResourceNotFoundException(String.format("The employee %d couldn't be found in project %d.",
                     employeeId, id));
         }
