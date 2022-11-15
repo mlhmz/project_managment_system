@@ -3,7 +3,6 @@ package de.szut.lf8_project.project.services;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.project.entities.Project;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
-import de.szut.lf8_project.project.repositories.ProjectEmployeeRepository;
 import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
