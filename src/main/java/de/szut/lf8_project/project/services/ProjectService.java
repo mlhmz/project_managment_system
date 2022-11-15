@@ -13,13 +13,11 @@ import java.util.Set;
 
 @Service
 public class ProjectService {
-
     private final ProjectRepository repository;
-    private final ProjectEmployeeRepository projectEmployeeRepository;
 
-    public ProjectService(ProjectRepository repository, ProjectEmployeeRepository projectEmployeeRepository) {
+    public ProjectService(ProjectRepository repository) {
         this.repository = repository;
-        this.projectEmployeeRepository = projectEmployeeRepository;
+
     }
 
     /**
@@ -30,28 +28,6 @@ public class ProjectService {
      */
     public Project saveProject(Project project) {
         return this.repository.save(project);
-    }
-
-    /**
-     * Removes Employee from {@link Project} and deletes {@link ProjectEmployee} Entity
-     *
-     * @param projectId ID of the {@link Project}
-     * @param employeeId ID of the Employee
-     * @return callback if the Employee was removed
-     */
-    public boolean removeEmployeeFromProject(long projectId, long employeeId){
-        return this.projectEmployeeRepository.deleteProjectEmployeeByProjectIdAndEmployeeId(projectId,employeeId);
-    }
-
-    /**
-     * Checks if the Employee is involved in the Project
-     *
-     * @param projectId ID of the Project
-     * @param employeeId ID of the Employee
-     * @return callback if the Employee is involved
-     */
-    public boolean isEmployeeInvolvedInProject(long projectId, long employeeId){
-        return this.projectEmployeeRepository.existsProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
     }
 
     /**

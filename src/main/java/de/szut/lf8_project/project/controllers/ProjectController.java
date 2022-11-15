@@ -9,6 +9,7 @@ import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.services.ProjectEmployeeService;
 import de.szut.lf8_project.project.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,12 +28,15 @@ import java.util.List;
 @RequestMapping("project")
 public class ProjectController {
     private final ProjectService projectService;
+    private final ProjectEmployeeService projectEmployeeService;
     private final MappingService mappingService;
     private final EmployeeService employeeService;
 
-    public ProjectController(ProjectService projectService, MappingService mappingService,
+    public ProjectController(ProjectService projectService, ProjectEmployeeService projectEmployeeService,
+                             MappingService mappingService,
                              EmployeeService employeeService) {
         this.projectService = projectService;
+        this.projectEmployeeService = projectEmployeeService;
         this.mappingService = mappingService;
         this.employeeService = employeeService;
     }
@@ -245,8 +249,8 @@ public class ProjectController {
     )
     @PutMapping("/{id}/remove/employee/{employeeId}")
     public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
-        if (this.projectService.isEmployeeInvolvedInProject(id, employeeId) &&
-                this.projectService.removeEmployeeFromProject(id, employeeId)) {
+        if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
+                this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
             return new ResponseEntity<>(
                     mappingService.mapProjectToGetProjectDto(
                             this.projectService.readProjectById(id)
