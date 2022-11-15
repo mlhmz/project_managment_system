@@ -29,16 +29,8 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
-    public Project addProjectEmployeeToProject(Long projectId, ProjectEmployee projectEmployee){
-        Optional<Project> response = repository.findById(projectId);
-
-        if (response.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("The Project with the Id %d couldn't found", projectId));
-        }
-
-        Project project = response.get();
+    public Project addProjectEmployeeToProject(Project project, ProjectEmployee projectEmployee){
         project.getEmployeeIds().add(projectEmployee);
-
         return this.repository.save(project);
     }
 

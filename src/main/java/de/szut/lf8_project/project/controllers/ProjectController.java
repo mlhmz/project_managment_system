@@ -9,6 +9,7 @@ import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -243,11 +244,13 @@ public class ProjectController {
             throw new ResourceNotFoundException(String.format("The Employee with the Id %d couldn't be found", employeeId));
         }
 
-
-        Project project = projectService.addProjectEmployeeToProject(projectId,
-                mappingService.buildProjectEmployee(projectId));
+        Project project = projectService.readProjectById(projectId);
+        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(projectId);
 
         // TODO: Nach Einbau von GetProjectDto ergänzen
-        return new ResponseEntity<>(project, HttpStatus.OK);
+        return new ResponseEntity<>(
+                projectService.addProjectEmployeeToProject(project, projectEmployee),
+                HttpStatus.OK
+        );
     }
 }
