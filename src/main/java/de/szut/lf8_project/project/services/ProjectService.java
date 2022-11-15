@@ -32,23 +32,14 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
-    public boolean isEmployeeInvolvedInProject(long projectId, long employeeId){
-        Optional<Project> project = this.repository.findById(projectId);
-
-        if(project.isEmpty()){
-            throw new ResourceNotFoundException(String.format("The project with the id %d couldn't be found.",
-                    projectId));
-        }
-
-        Optional<ProjectEmployee> employee =
-                this.projectEmployeeRepository.findProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
-        return employee.isPresent();
-    }
-
     public boolean deleteEmployeeFromProject(long projectId, long employeeId){
         return this.projectEmployeeRepository.deleteProjectEmployeeByProjectIdAndEmployeeId(projectId,employeeId);
     }
-    
+
+    public boolean isEmployeeInvolvedInProject(long projectId, long employeeId){
+        return this.projectEmployeeRepository.existsProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
+    }
+
     /**
      * Deletes project by id
      *

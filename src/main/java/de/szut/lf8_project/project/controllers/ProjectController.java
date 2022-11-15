@@ -253,22 +253,16 @@ public class ProjectController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @RequestBody long employeeId,
                                                              @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if (employeeService.isEmployeeExisting(employeeId, token)) {
-            // TODO: Nötigen HATEOAS setzen
-            if(this.projectService.isEmployeeInvolvedInProject(id,employeeId)){
-                if(this.projectService.deleteEmployeeFromProject(id,employeeId)){
-                    return new ResponseEntity<>(HttpStatus.OK);
-                }else{
-                    throw new RuntimeException(String.format("Something went wrong in the deletion process for " +
-                                    "project %d and employee %d", id, employeeId));
-                }
+        if(this.projectService.isEmployeeInvolvedInProject(id,employeeId)){
+            if(this.projectService.deleteEmployeeFromProject(id,employeeId)){
+                return new ResponseEntity<>(HttpStatus.OK);
             }else{
-                throw new ResourceNotFoundException(String.format("The employee %d couldn't be found in project %d.",
-                        employeeId, id));
+                throw new RuntimeException(String.format("Something went wrong in the deletion process for " +
+                                "project %d and employee %d", id, employeeId));
             }
-        } else {
-            throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
-                    employeeId));
+        }else{
+            throw new ResourceNotFoundException(String.format("The employee %d couldn't be found in project %d.",
+                    employeeId, id));
         }
     }
 }
