@@ -1,3 +1,4 @@
+### Create project
 POST http://localhost:8089/project
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -9,3 +10,33 @@ Content-Type: application/json
   "startDate": "2021-07-01_11-11-11",
   "plannedEndDate": "2022-10-13_11-11-11"
 }
+
+### Gets all projects
+GET http://localhost:8089/project
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Gets project with certain Id
+GET http://localhost:8089/project/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Gets employee references from a project
+GET http://localhost:8089/project/1/employees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Gets project of a responsible employee
+GET http://localhost:8089/project/responsible/9
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Gets projects of a customer
+GET http://localhost:8089/project/customer/9
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### Get Employee from SZUT API
+GET https://employee.szut.dev/employees/9
+Authorization: Bearer {{token}}
+Content-Type: application/json
