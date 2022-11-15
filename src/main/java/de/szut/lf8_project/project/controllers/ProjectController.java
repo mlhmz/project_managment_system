@@ -253,7 +253,8 @@ public class ProjectController {
                     ), HttpStatus.OK
             );
         } else {
-            throw new ResourceNotFoundException(String.format("The employee %d couldn't be found in project %d.",
+            // TODO: Change to 400 after ExceptionHandling
+            throw new ResourceNotFoundException(String.format("The employee %d isn't involved in Project %d.",
                     employeeId, id));
         }
     }
