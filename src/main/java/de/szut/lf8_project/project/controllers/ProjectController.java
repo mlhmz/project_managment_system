@@ -239,13 +239,12 @@ public class ProjectController {
     @Operation(summary = "Removes an Employee from a Project")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Removed Employee",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CreateProjectDto.class))}),
+                    content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
                     content = @Content)}
     )
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @RequestBody long employeeId) {
+    @PutMapping("/{id}/remove/employee/{employeeId}")
+    public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
         if (this.projectService.isEmployeeInvolvedInProject(id, employeeId)) {
             if (this.projectService.deleteEmployeeFromProject(id, employeeId)) {
                 return new ResponseEntity<>(HttpStatus.OK);
