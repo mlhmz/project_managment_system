@@ -1,23 +1,22 @@
 package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
-import de.szut.lf8_project.mapping.MappingService;
-import de.szut.lf8_project.project.repositories.ProjectRepository;
-import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
+import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class ProjectService {
-
     private final ProjectRepository repository;
 
-    public ProjectService(ProjectRepository repository, MappingService mapper) {
+    public ProjectService(ProjectRepository repository) {
         this.repository = repository;
+
     }
 
     /**

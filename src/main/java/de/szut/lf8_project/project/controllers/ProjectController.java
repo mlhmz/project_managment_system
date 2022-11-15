@@ -9,6 +9,7 @@ import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.services.ProjectEmployeeService;
 import de.szut.lf8_project.project.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,12 +28,15 @@ import java.util.List;
 @RequestMapping("project")
 public class ProjectController {
     private final ProjectService projectService;
+    private final ProjectEmployeeService projectEmployeeService;
     private final MappingService mappingService;
     private final EmployeeService employeeService;
 
-    public ProjectController(ProjectService projectService, MappingService mappingService,
+    public ProjectController(ProjectService projectService, ProjectEmployeeService projectEmployeeService,
+                             MappingService mappingService,
                              EmployeeService employeeService) {
         this.projectService = projectService;
+        this.projectEmployeeService = projectEmployeeService;
         this.mappingService = mappingService;
         this.employeeService = employeeService;
     }
@@ -57,12 +61,12 @@ public class ProjectController {
             )}
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        consumes = "application/json",
-        produces = "application/hal+json"
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/hal+json"
     )
     public ResponseEntity<GetProjectDto> createProject(@RequestBody @Valid final CreateProjectDto dto,
-                                                 @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) {
+                                                       @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) {
         Project project = mappingService.mapCreateProjectDtoToProject(dto);
 
         long responsibleEmployeeId = dto.getResponsibleEmployeeId();
@@ -111,7 +115,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Responsible Employee couldn't be found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             value = "/responsible/{employeeId}",
@@ -155,7 +159,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             method = RequestMethod.GET,
@@ -177,7 +181,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project couldn't be found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
-        }
+    }
     )
     @RequestMapping(
             value = "/{id}",
@@ -206,7 +210,7 @@ public class ProjectController {
                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         Long responsibleEmployeeId = dto.getResponsibleEmployeeId();
 
-        if(responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)){
+        if (responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
             throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
                     responsibleEmployeeId));
         }
@@ -233,6 +237,29 @@ public class ProjectController {
             projectService.deleteProject(id);
         } else {
             throw new ResourceNotFoundException("The Project with the id %d couldn't be found ");
+        }
+    }
+
+    @Operation(summary = "Removes an Employee from a Project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Removed Employee",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
+                    content = @Content)}
+    )
+    @PutMapping("/{id}/remove/employee/{employeeId}")
+    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
+        if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
+                this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
+            return new ResponseEntity<>(
+                    mappingService.mapProjectToGetProjectDto(
+                            this.projectService.readProjectById(id)
+                    ), HttpStatus.OK
+            );
+        } else {
+            // TODO: Change to 400 after ExceptionHandling
+            throw new ResourceNotFoundException(String.format("The employee %d isn't involved in Project %d.",
+                    employeeId, id));
         }
     }
 }
