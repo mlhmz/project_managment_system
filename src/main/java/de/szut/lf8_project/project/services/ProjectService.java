@@ -33,16 +33,16 @@ public class ProjectService {
     }
 
     public boolean isEmployeeInvolvedInProject(long projectId, long employeeId){
-        Optional<Project> oProject = this.repository.findById(projectId);
-        if(oProject.isPresent()){
-            Optional<ProjectEmployee> oEmployee =
-                    this.projectEmployeeRepository.findProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
-                return oEmployee.isPresent();
-        } else {
-            // TODO: 400 Bad Request wenn employee nicht in Project beteiligt ist.
+        Optional<Project> project = this.repository.findById(projectId);
+
+        if(project.isEmpty()){
             throw new ResourceNotFoundException(String.format("The project with the id %d couldn't be found.",
                     projectId));
         }
+
+        Optional<ProjectEmployee> employee =
+                this.projectEmployeeRepository.findProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
+        return employee.isPresent();
     }
 
     public boolean deleteEmployeeFromProject(long projectId, long employeeId){
