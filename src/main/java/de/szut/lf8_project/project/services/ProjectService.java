@@ -37,12 +37,19 @@ public class ProjectService {
      *
      * @param projectId ID of the {@link Project}
      * @param employeeId ID of the Employee
-     * @return callback if the employee was removed
+     * @return callback if the Employee was removed
      */
     public boolean removeEmployeeFromProject(long projectId, long employeeId){
         return this.projectEmployeeRepository.deleteProjectEmployeeByProjectIdAndEmployeeId(projectId,employeeId);
     }
 
+    /**
+     * Checks if the Employee is involved in the Project
+     *
+     * @param projectId ID of the Project
+     * @param employeeId ID of the Employee
+     * @return callback if the Employee is involved
+     */
     public boolean isEmployeeInvolvedInProject(long projectId, long employeeId){
         return this.projectEmployeeRepository.existsProjectEmployeeByProjectIdAndEmployeeId(projectId, employeeId);
     }
