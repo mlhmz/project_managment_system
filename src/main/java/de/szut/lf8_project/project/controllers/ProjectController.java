@@ -236,19 +236,13 @@ public class ProjectController {
         }
     }
 
-    /**
-     * Löscht einen Mitarbeiter aus einem Project mittels Delete-Request
-     * <p>
-     * TODO: Sobald das GetObjectDto erstellt wurde sollte dies durch das Project als ResponseEntity ersetzt werden
-     */
-    @Operation(summary = "creates a new project with its id")
+    @Operation(summary = "Removes an Employee from a Project")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "created project",
+            @ApiResponse(responseCode = "200", description = "Removed Employee",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = CreateProjectDto.class))}),
             @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
-                    content = @Content),
-            @ApiResponse(responseCode = "404", description = "If the project or the employee could't be found")}
+                    content = @Content)}
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @RequestBody long employeeId) {
