@@ -32,7 +32,14 @@ public class ProjectService {
         return this.repository.save(project);
     }
 
-    public boolean deleteEmployeeFromProject(long projectId, long employeeId){
+    /**
+     * Removes Employee from {@link Project} and deletes {@link ProjectEmployee} Entity
+     *
+     * @param projectId ID of the {@link Project}
+     * @param employeeId ID of the Employee
+     * @return callback if the employee was removed
+     */
+    public boolean removeEmployeeFromProject(long projectId, long employeeId){
         return this.projectEmployeeRepository.deleteProjectEmployeeByProjectIdAndEmployeeId(projectId,employeeId);
     }
 

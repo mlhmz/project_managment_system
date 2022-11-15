@@ -244,14 +244,14 @@ public class ProjectController {
                     content = @Content)}
     )
     @PutMapping("/{id}/remove/employee/{employeeId}")
-    public ResponseEntity<Project> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
-        if (this.projectService.isEmployeeInvolvedInProject(id, employeeId)) {
-            if (this.projectService.deleteEmployeeFromProject(id, employeeId)) {
-                return new ResponseEntity<>(HttpStatus.OK);
-            } else {
-                throw new RuntimeException(String.format("Something went wrong in the deletion process for " +
-                        "project %d and employee %d", id, employeeId));
-            }
+    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
+        if (this.projectService.isEmployeeInvolvedInProject(id, employeeId) &&
+                this.projectService.removeEmployeeFromProject(id, employeeId)) {
+            return new ResponseEntity<>(
+                    mappingService.mapProjectToGetProjectDto(
+                            this.projectService.readProjectById(id)
+                    ), HttpStatus.OK
+            );
         } else {
             throw new ResourceNotFoundException(String.format("The employee %d couldn't be found in project %d.",
                     employeeId, id));
