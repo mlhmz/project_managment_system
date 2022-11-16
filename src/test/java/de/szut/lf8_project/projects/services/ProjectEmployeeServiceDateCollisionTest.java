@@ -1,7 +1,8 @@
-package de.szut.lf8_project.project.services;
+package de.szut.lf8_project.projects.services;
 
 import de.szut.lf8_project.project.entities.Project;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
+import de.szut.lf8_project.project.services.ProjectEmployeeService;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
