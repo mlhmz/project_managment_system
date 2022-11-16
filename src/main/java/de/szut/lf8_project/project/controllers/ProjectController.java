@@ -249,6 +249,12 @@ public class ProjectController {
         }
 
         Project project = projectService.readProjectById(projectId);
+
+        if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
+            // TODO: 400?
+            throw new RuntimeException("Employee not available in Timeslot");
+        }
+
         ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(projectId);
 
         GetProjectDto dto = mappingService.mapProjectToGetProjectDto(
