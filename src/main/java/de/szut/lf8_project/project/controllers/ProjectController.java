@@ -5,6 +5,7 @@ import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
 import de.szut.lf8_project.employee.QualificationService;
 import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_project.exceptionHandling.UnprocessableEntityException;
 import de.szut.lf8_project.mapping.MappingService;
 import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
@@ -250,6 +251,9 @@ public class ProjectController {
                             schema = @Schema(implementation = ErrorDetails.class))}),
             @ApiResponse(responseCode = "404", description = "Project, Employee or Qualification couldn't be found",
                     content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})}
     )
     @PutMapping("/{id}/add/employee/{employeeId}")
@@ -257,8 +261,7 @@ public class ProjectController {
                                                                @RequestParam String qualification,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if (!employeeService.isEmployeeOwningCertainQualification(employeeId, qualification, token)) {
-            // TODO: 400? Change Message!
-            throw new RuntimeException(
+            throw new UnprocessableEntityException(
                     String.format("The employee with the id '%d' doesn't own the qualification '%s'",
                             employeeId, qualification)
             );
@@ -267,8 +270,8 @@ public class ProjectController {
         Project project = projectService.readProjectById(id);
 
         if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
-            // TODO: 400? Change Message!
-            throw new RuntimeException("Employee not available in Timeslot");
+            throw new UnprocessableEntityException(String.format("The employee with the id %d is not available in the projects timeslot.",
+                    id));
         }
 
         ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(id);
@@ -288,6 +291,9 @@ public class ProjectController {
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})
     }
     )
@@ -301,8 +307,7 @@ public class ProjectController {
                     ), HttpStatus.OK
             );
         } else {
-            // TODO: Change to 400 after ExceptionHandling
-            throw new ResourceNotFoundException(String.format("The employee %d isn't involved in Project %d.",
+            throw new UnprocessableEntityException(String.format("The employee %d isn't involved in Project %d.",
                     employeeId, id));
         }
     }
