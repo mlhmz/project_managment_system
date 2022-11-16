@@ -1,39 +1,39 @@
 package de.szut.lf8_project.projects;
 
-import org.json.JSONObject;
+import de.szut.lf8_project.AuthorizedIT;
+import de.szut.lf8_project.project.entities.Project;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import testcontainers.AbstractIntegrationTest;
+import org.springframework.http.HttpHeaders;
+
+import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AddEmployeeToProjectIT extends AbstractIntegrationTest {
+public class AddEmployeeToProjectIT extends AuthorizedIT {
 
     @Test
     public void addEmployeeToProject() throws Exception {
-        String content_project = """
-                {
-                         "responsibleEmployeeId": "1",
-                         "customerId": "1",
-                         "comment": "This is a new project!",
-                         "startDate": "2022-12-24_12-00-00",
-                         "plannedEndDate": "2022-12-27_23-59-59"
-                }
-                """;
+        Project project = Project.builder()
+                .responsibleEmployeeId(9L)
+                .customerId(1L)
+                .comment("This is a new project!")
+                .startDate(LocalDateTime.of(2022, 12, 24, 12, 0, 0))
+                .plannedEndDate(LocalDateTime.of(2022, 12, 27, 23, 59, 59))
+                .build();
 
-        final var contentAsString = this.mockMvc.perform(post("/project")
-                        .content(content_project).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+        project = projectRepository.save(project);
 
-        final var id = Long.parseLong(new JSONObject(contentAsString).get("id").toString());
+        this.mockMvc.perform(
+                put("/project/{id}/add/employee/{employeeId}?qualification={qualification}",
+                        project.getId(), 10, "Java")
+                        .header(HttpHeaders.AUTHORIZATION, fetchJWT()))
+                .andExpect(status().isOk());
 
-        final var response = this.mockMvc.perform(put("/" + id + "/add/employee/" + 2)).andExpect(status().isOk());
+        final var loadedEntity = projectEmployeeRepository.existsProjectEmployeeByProjectIdAndEmployeeId(project.getId(), 10);
 
-        final var loadedEntity = projectEmployeeRepository.existsProjectEmployeeByProjectIdAndEmployeeId(1, 2);
         assertThat(loadedEntity, is(true));
     }
 }
