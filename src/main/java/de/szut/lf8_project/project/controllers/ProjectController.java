@@ -251,8 +251,8 @@ public class ProjectController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})}
     )
-    @PutMapping("/{id}/add/employee/{employeeId)")
-    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@RequestParam Long id, @RequestParam Long employeeId,
+    @PutMapping("/{id}/add/employee/{employeeId}")
+    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@PathVariable Long id, @PathVariable Long employeeId,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(!employeeService.isEmployeeExisting(employeeId, token)) {
             throw new ResourceNotFoundException(String.format("The Employee with the Id %d couldn't be found", employeeId));
