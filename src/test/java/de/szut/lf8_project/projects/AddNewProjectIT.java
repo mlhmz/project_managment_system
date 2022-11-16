@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDateTime;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,7 +20,7 @@ public class AddNewProjectIT extends AuthorizedIT {
     public void createProject() throws Exception{
         String content = """
                 {
-                         "responsibleEmployeeId": "1",
+                         "responsibleEmployeeId": "9",
                          "customerId": "1",
                          "comment": "This is a new project!",
                          "startDate": "2022-12-24_12-00-00",
@@ -30,11 +32,11 @@ public class AddNewProjectIT extends AuthorizedIT {
                 .content(content).contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, fetchJWT()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("responsibleEmployeeId", is("1")))
-                .andExpect(jsonPath("customerId", is("1")))
+                .andExpect(jsonPath("responsibleEmployee.id", is(9)))
+                .andExpect(jsonPath("customerId", is(1)))
                 .andExpect(jsonPath("comment", is("This is a new project!")))
-                .andExpect(jsonPath("startDate", is("2022-12-24_12-00-00")))
-                .andExpect(jsonPath("plannedEndDate", is("2022-12-27_23-59-59")))
+                .andExpect(jsonPath("startDate", is("2022-12-24T12:00:00")))
+                .andExpect(jsonPath("plannedEndDate", is("2022-12-27T23:59:59")))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -44,10 +46,12 @@ public class AddNewProjectIT extends AuthorizedIT {
         final var loadedEntity = projectRepository.findById(id);
 
         assertThat(loadedEntity.isPresent(), is(true));
-        assertThat(loadedEntity.get(), hasProperty("id", equalTo(1)));
-        assertThat(loadedEntity.get().getCustomerId(), equalTo("1"));
+        assertThat(loadedEntity.get(), hasProperty("id", equalTo(1L)));
+        assertThat(loadedEntity.get().getCustomerId(), equalTo(1L));
         assertThat(loadedEntity.get().getComment(), equalTo("This is a new project!"));
-        assertThat(loadedEntity.get().getStartDate(), equalTo("2022-12-24_12-00-00"));
-        assertThat(loadedEntity.get().getEndDate(), equalTo("2022-12-27_23-59-59"));
+        assertThat(loadedEntity.get().getStartDate(), equalTo(
+                LocalDateTime.of(2022, 12, 24, 12, 0, 0)));
+        assertThat(loadedEntity.get().getPlannedEndDate(), equalTo(
+                LocalDateTime.of(2022, 12, 27, 23, 59, 59)));
     }
 }
