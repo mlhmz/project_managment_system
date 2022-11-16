@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AddNewProjectIT extends AuthorizedIT {
 
     @Test
-    public void createProject() throws Exception{
+    public void createProject() throws Exception {
         String content = """
                 {
                          "responsibleEmployeeId": "9",
@@ -47,6 +47,7 @@ public class AddNewProjectIT extends AuthorizedIT {
 
         assertThat(loadedEntity.isPresent(), is(true));
         assertThat(loadedEntity.get(), hasProperty("id", equalTo(1L)));
+        assertThat(loadedEntity.get().getResponsibleEmployeeId(), equalTo(9L));
         assertThat(loadedEntity.get().getCustomerId(), equalTo(1L));
         assertThat(loadedEntity.get().getComment(), equalTo("This is a new project!"));
         assertThat(loadedEntity.get().getStartDate(), equalTo(

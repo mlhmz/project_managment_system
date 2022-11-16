@@ -235,7 +235,7 @@ public class ProjectController {
 
     @Operation(summary = "Deletes a project by its unique id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Deleted project"),
+            @ApiResponse(responseCode = "200", description = "Deleted project"),
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))}),
@@ -255,7 +255,7 @@ public class ProjectController {
 
     @Operation(summary = "Adds an Employee to a Project")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Added employee to project"),
+            @ApiResponse(responseCode = "200", description = "Added employee to project"),
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))}),
@@ -295,7 +295,7 @@ public class ProjectController {
   
     @Operation(summary = "Removes an Employee from a Project")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Removed Employee",
+            @ApiResponse(responseCode = "200", description = "Removed Employee",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
                     content = @Content),
