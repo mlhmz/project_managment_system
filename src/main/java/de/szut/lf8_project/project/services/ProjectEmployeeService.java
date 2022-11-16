@@ -28,7 +28,7 @@ public class ProjectEmployeeService {
         List<ProjectEmployee> projectEmployee = projectEmployeeRepository.getProjectEmployeesByEmployeeId(employeeId);
 
         for (ProjectEmployee employee : projectEmployee) {
-            if (isProjectEmployeeInSpan(startDate, plannedEndDate, employee)) return false;
+            if (isProjectEmployeeDateColliding(startDate, plannedEndDate, employee)) return false;
         }
 
         return true;
@@ -39,13 +39,15 @@ public class ProjectEmployeeService {
      *
      * @return boolean if the project employee is in span with start and end date
      */
-    public boolean isProjectEmployeeInSpan(LocalDateTime startDate, LocalDateTime endDate, ProjectEmployee employee) {
+    public boolean isProjectEmployeeDateColliding(LocalDateTime startDate, LocalDateTime endDate, ProjectEmployee employee) {
         Project project = employee.getProject();
         LocalDateTime projectStartDate = project.getStartDate();
         LocalDateTime projectEndDate = project.getPlannedEndDate();
 
         return (startDate.isAfter(projectStartDate) && startDate.isBefore(projectEndDate)) ||
-                (endDate.isAfter(projectStartDate) && endDate.isBefore(projectEndDate));
+                (endDate.isAfter(projectStartDate) && endDate.isBefore(projectEndDate)
+                || projectStartDate.isAfter(startDate) && projectStartDate.isBefore(endDate) ||
+                        projectEndDate.isAfter(endDate) && projectEndDate.isBefore(endDate));
     }
 
     /**
