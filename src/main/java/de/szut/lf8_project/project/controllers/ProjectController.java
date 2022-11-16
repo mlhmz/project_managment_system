@@ -263,7 +263,11 @@ public class ProjectController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})}
     )
-    @PutMapping("/{id}/add/employee/{employeeId}")
+    @RequestMapping(
+            path = "/{id}/add/employee/{employeeId}",
+            method = RequestMethod.PUT,
+            produces = "application/hal+json"
+    )
     public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@PathVariable Long id, @PathVariable Long employeeId,
                                                                @RequestParam String qualification,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
@@ -304,7 +308,11 @@ public class ProjectController {
                             schema = @Schema(implementation = ErrorDetails.class))})
     }
     )
-    @PutMapping("/{id}/remove/employee/{employeeId}")
+    @RequestMapping(
+            path = "/{id}/remove/employee/{employeeId}",
+            method = RequestMethod.PUT,
+            produces = "application/hal+json"
+    )
     public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId) {
         if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
                 this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
