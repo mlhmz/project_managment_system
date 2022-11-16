@@ -1,5 +1,6 @@
 package testcontainers;
 
+import de.szut.lf8_project.Lf8ProjectApplication;
 import de.szut.lf8_project.project.repositories.ProjectEmployeeRepository;
 import de.szut.lf8_project.project.repositories.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * <p>
  * To use other context beans use org.springframework.context.annotation.@Import annotation.
  */
-@SpringBootTest
+@SpringBootTest(classes = {Lf8ProjectApplication.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("it")
 @ContextConfiguration(initializers = PostgresContextInitializer.class)
