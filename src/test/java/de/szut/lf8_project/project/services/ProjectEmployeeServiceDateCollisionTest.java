@@ -2,7 +2,6 @@ package de.szut.lf8_project.project.services;
 
 import de.szut.lf8_project.project.entities.Project;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -33,13 +32,16 @@ class ProjectEmployeeServiceDateCollisionTest {
 
     }
 
-    @Test
-    void isProjectEmployeeDateCollidingFalse() {
+    @ParameterizedTest
+    @CsvSource({"2022/11/25,2022/11/27",
+            "2022/11/5,2022/11/14",
+    })
+    void isProjectEmployeeDateCollidingFalse(String startDateString, String endDateString) {
         ProjectEmployeeService service = new ProjectEmployeeService(null);
 
         assertFalse(service.isProjectEmployeeDateColliding(
-                getLocalDateTime(2022, 11, 25),
-                getLocalDateTime(2022, 11, 27),
+                convertStringDate(startDateString),
+                convertStringDate(endDateString),
                 buildProjectEmployee()));
     }
 
@@ -54,8 +56,8 @@ class ProjectEmployeeServiceDateCollisionTest {
         return employee;
     }
 
-    private static LocalDateTime convertStringDate(String startDateString) {
-        String[] dateSplit = startDateString.split("/");
+    private static LocalDateTime convertStringDate(String dateString) {
+        String[] dateSplit = dateString.split("/");
         return getLocalDateTime(Integer.parseInt(dateSplit[0]),
                 Integer.parseInt(dateSplit[1]),
                 Integer.parseInt(dateSplit[2]));
