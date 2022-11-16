@@ -2,11 +2,19 @@ package de.szut.lf8_project.project.controllers;
 
 import de.szut.lf8_project.customer.CustomerService;
 import de.szut.lf8_project.employee.EmployeeService;
+import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
+import de.szut.lf8_project.employee.QualificationService;
+import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_project.exceptionHandling.UnprocessableEntityException;
 import de.szut.lf8_project.mapping.MappingService;
-import de.szut.lf8_project.project.services.ProjectService;
+import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
+import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
+import de.szut.lf8_project.project.services.ProjectEmployeeService;
+import de.szut.lf8_project.project.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,59 +26,292 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("project")
 public class ProjectController {
     private final ProjectService projectService;
+    private final ProjectEmployeeService projectEmployeeService;
     private final MappingService mappingService;
     private final EmployeeService employeeService;
     private final CustomerService customerService;
 
-    public ProjectController(ProjectService projectService, MappingService mappingService,
-                             EmployeeService employeeService, CustomerService customerService) {
+    public ProjectController(ProjectService projectService, ProjectEmployeeService projectEmployeeService,
+                             MappingService mappingService,
+                             EmployeeService employeeService) {
         this.projectService = projectService;
+        this.projectEmployeeService = projectEmployeeService;
         this.mappingService = mappingService;
         this.employeeService = employeeService;
         this.customerService = customerService;
-        // TODO: Abfrage ob der Kunde auch existiert bei erstellen des Projekts
     }
 
     /**
      * Erstellt ein Projekt mit einer Post-Request
-     * <p>
-     * TODO: Sobald das GetObjectDto erstellt wurde sollte dies durch das Project als ResponseEntity ersetzt werden
      */
-    @Operation(summary = "creates a new project with its id")
+    @Operation(summary = "Creates a new project with its id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created project",
+            @ApiResponse(responseCode = "201", description = "Created project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetProjectDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid JSON posted",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CreateProjectDto.class))}),
-            @ApiResponse(responseCode = "400", description = "invalid JSON posted",
-                    content = @Content),
-            @ApiResponse(responseCode = "401", description = "not authorized",
-                    content = @Content),
-            @ApiResponse(responseCode = "404", description = "If the customer or the responsible " +
-                    "Employee couldn't be found")}
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Customer or the responsible Employee couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}
+            )}
     )
-    @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody @Valid final CreateProjectDto dto,
-                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<GetProjectDto> createProject(@RequestBody @Valid final CreateProjectDto dto,
+                                                       @RequestHeader(value = HttpHeaders.AUTHORIZATION) String token) {
+        Project project = mappingService.mapCreateProjectDtoToProject(dto);
 
-        // TODO: Mit GetArticleDTO als Hateoas einbinden
-        //  - Existenz prüfen mit einer isEmployeeExisting() Methode
-        //  - Wenn existiert dann HATEOAS quasi einbinden
         long responsibleEmployeeId = dto.getResponsibleEmployeeId();
-        if (employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
-            // TODO: Nötigen HATEOAS setzen
-        } else {
+        if (!employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
             throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
                     responsibleEmployeeId));
         }
 
+        Project createdProject = projectService.saveProject(project);
+        return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(createdProject), HttpStatus.CREATED);
+    }
 
-        return new ResponseEntity<>(projectService.createProject(
-                mappingService.mapCreateProjectDtoToProject(dto)
-        ), HttpStatus.CREATED);
+    @Operation(summary = "Gets employee references from a project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetEmployeeReferencesDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @RequestMapping(
+            value = "/{id}/employees",
+            method = RequestMethod.GET,
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<GetEmployeeReferencesDto> getEmployeesFromProject(@PathVariable long id) {
+        return new ResponseEntity<>(
+                mappingService.mapProjectEmployeesToGetEmployeeReferencesDto(projectService.readAllEmployeesFromProject(id)),
+                HttpStatus.OK
+        );
+    }
+
+
+    @Operation(summary = "Gets projects of a responsible employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetEmployeeReferencesDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Responsible Employee couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
+    )
+    @RequestMapping(
+            value = "/responsible/{employeeId}",
+            method = RequestMethod.GET,
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<List<GetProjectDto>> getProjectsByResponsibleEmployee(@PathVariable long employeeId) {
+        return new ResponseEntity<>(
+                mappingService.mapProjectsToGetProjectList(projectService.readProjectsByResponsibleEmployeeId(employeeId)),
+                HttpStatus.OK
+        );
+    }
+
+    @Operation(summary = "Gets projects of a customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetEmployeeReferencesDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Customer couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @RequestMapping(
+            value = "/customer/{customerId}",
+            method = RequestMethod.GET,
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<List<GetProjectDto>> getProjectsByCustomer(@PathVariable long customerId) {
+        List<Project> projectList = this.projectService.readProjectsByCustomerId(customerId);
+        return new ResponseEntity<>(mappingService.mapProjectsToGetProjectList(projectList), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Gets all projects")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetEmployeeReferencesDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
+    )
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<List<GetProjectDto>> getProjects() {
+        List<Project> projectList = this.projectService.readAllProjects();
+        return new ResponseEntity<>(mappingService.mapProjectsToGetProjectList(projectList), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Gets a project by its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found project",
+                    content = {@Content(mediaType = "application/hal+json",
+                            schema = @Schema(implementation = GetEmployeeReferencesDto.class))}),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
+    )
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.GET,
+            produces = "application/hal+json"
+    )
+    public ResponseEntity<GetProjectDto> getProjectById(@PathVariable long id) {
+        Project project = projectService.readProjectById(id);
+        return new ResponseEntity<>(mappingService.mapProjectToGetProjectDto(project), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Updates a project with its id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Updated project",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ChangeProjectDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid JSON posted",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Project or employee couldn't be found")}
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<Project> updateProject(@RequestBody @Valid final ChangeProjectDto dto,
+                                                 @PathVariable Long id,
+                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        Long responsibleEmployeeId = dto.getResponsibleEmployeeId();
+
+        if (responsibleEmployeeId == null || !employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
+            throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
+                    responsibleEmployeeId));
+        }
+
+        Project project = mappingService.mapUpdateProjectDtoIntoProject(dto, projectService.readProjectById(id));
+
+        return new ResponseEntity<>(projectService.saveProject(project), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Deletes a project by its unique id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Deleted project"),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @DeleteMapping("/{id}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void deleteProjectById(@PathVariable Long id) {
+        if (projectService.isProjectExisting(id)) {
+            projectService.deleteProject(id);
+        } else {
+            throw new ResourceNotFoundException("The Project with the id %d couldn't be found ");
+        }
+    }
+
+    @Operation(summary = "Adds an Employee to a Project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Added employee to project"),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project, Employee or Qualification couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @PutMapping("/{id}/add/employee/{employeeId}")
+    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@PathVariable Long id, @PathVariable Long employeeId,
+                                                               @RequestParam String qualification,
+                                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if (!employeeService.isEmployeeOwningCertainQualification(employeeId, qualification, token)) {
+            throw new UnprocessableEntityException(
+                    String.format("The employee with the id '%d' doesn't own the qualification '%s'",
+                            employeeId, qualification)
+            );
+        }
+
+        Project project = projectService.readProjectById(id);
+
+        if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
+            throw new UnprocessableEntityException(String.format("The employee with the id %d is not available in the projects timeslot.",
+                    id));
+        }
+
+        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(id);
+
+        GetProjectDto dto = mappingService.mapProjectToGetProjectDto(
+                projectService.addProjectEmployeeToProject(project, projectEmployee)
+        );
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+     }
+  
+    @Operation(summary = "Removes an Employee from a Project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Removed Employee",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
+    )
+    @PutMapping("/{id}/remove/employee/{employeeId}")
+    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId) {
+        if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
+                this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
+            return new ResponseEntity<>(
+                    mappingService.mapProjectToGetProjectDto(
+                            this.projectService.readProjectById(id)
+                    ), HttpStatus.OK
+            );
+        } else {
+            throw new UnprocessableEntityException(String.format("The employee %d isn't involved in Project %d.",
+                    employeeId, id));
+        }
     }
 }
