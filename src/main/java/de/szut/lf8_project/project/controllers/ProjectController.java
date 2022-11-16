@@ -46,9 +46,6 @@ public class ProjectController {
         this.customerService = customerService;
     }
 
-    /**
-     * Erstellt ein Projekt mit einer Post-Request
-     */
     @Operation(summary = "Creates a new project with its id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created project",
