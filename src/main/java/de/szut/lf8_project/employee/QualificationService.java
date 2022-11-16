@@ -23,7 +23,7 @@ public class QualificationService {
     public String[] getAllQualifications(String bearerToken) {
         RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL)
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + bearerToken).build();
+                .header("Authorization", bearerToken).build();
 
         return template.exchange(request, String[].class).getBody();
     }
