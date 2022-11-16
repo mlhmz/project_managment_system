@@ -224,7 +224,7 @@ public class ProjectController {
     @Operation(summary = "Deletes a project by its unique id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Deleted project"),
-            @ApiResponse(responseCode = "401", description = "Project doesn't contain valid bearer token",
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))}),
             @ApiResponse(responseCode = "404", description = "Project couldn't be found",
@@ -241,6 +241,16 @@ public class ProjectController {
         }
     }
 
+    @Operation(summary = "Adds an Employee to a Project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Added employee to project"),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project or Employee couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
     @PutMapping("/{id}/add/employee/{employeeId)")
     public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@RequestParam Long id, @RequestParam Long employeeId,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
@@ -266,10 +276,14 @@ public class ProjectController {
   
     @Operation(summary = "Removes an Employee from a Project")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Removed Employee",
+            @ApiResponse(responseCode = "201", description = "Removed Employee",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
-                    content = @Content)}
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
     )
     @PutMapping("/{id}/remove/employee/{employeeId}")
     public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId) {
