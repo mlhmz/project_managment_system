@@ -39,7 +39,7 @@ public class ProjectEmployeeService {
      *
      * @return boolean if the project employee is in span with start and end date
      */
-    private boolean isProjectEmployeeInSpan(LocalDateTime startDate, LocalDateTime endDate, ProjectEmployee employee) {
+    public boolean isProjectEmployeeInSpan(LocalDateTime startDate, LocalDateTime endDate, ProjectEmployee employee) {
         Project project = employee.getProject();
         LocalDateTime projectStartDate = project.getStartDate();
         LocalDateTime projectEndDate = project.getPlannedEndDate();

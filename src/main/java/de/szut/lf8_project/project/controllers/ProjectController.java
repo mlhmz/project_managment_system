@@ -279,12 +279,12 @@ public class ProjectController {
 
         Project project = projectService.readProjectById(id);
 
-        if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
+        if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getPlannedEndDate())) {
             throw new UnprocessableEntityException(String.format("The employee with the id %d is not available in the projects timeslot.",
                     id));
         }
 
-        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(id);
+        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(employeeId, project);
 
         GetProjectDto dto = mappingService.mapProjectToGetProjectDto(
                 projectService.addProjectEmployeeToProject(project, projectEmployee)

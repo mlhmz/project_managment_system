@@ -6,7 +6,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,7 +19,8 @@ public class QualificationService {
 
     public boolean isQualificationExisting(String qualification, String bearerToken) {
         GetQualificationDto qualificationDto = new GetQualificationDto(qualification);
-        return getAllQualifications(bearerToken).contains(qualificationDto);
+        List<GetQualificationDto> allQualifications = getAllQualifications(bearerToken);
+        return allQualifications.contains(qualificationDto);
     }
 
     public List<GetQualificationDto> getAllQualifications(String bearerToken) {
