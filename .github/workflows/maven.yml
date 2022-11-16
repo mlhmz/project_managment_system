@@ -12,7 +12,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
-      - name: Builds
-        run: mvn -B package --file pom.xml
-      - name: Tests
-        run: mvn -B test --file pom.xml
+      - name: Run Integrationtests
+        run: mvn test -Dtest=de.szut.lf8_project.projects.*Test
+      - name: Run Service-Tests
+        run: mvn test -Dtest=de.szut.lf8_project.projects.*.*Test
