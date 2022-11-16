@@ -2,13 +2,16 @@ package de.szut.lf8_project.project.controllers;
 
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
+import de.szut.lf8_project.employee.QualificationService;
 import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_project.exceptionHandling.UnprocessableEntityException;
 import de.szut.lf8_project.mapping.MappingService;
 import de.szut.lf8_project.project.dto.ChangeProjectDto;
 import de.szut.lf8_project.project.dto.CreateProjectDto;
 import de.szut.lf8_project.project.dto.GetProjectDto;
 import de.szut.lf8_project.project.entities.Project;
+import de.szut.lf8_project.project.entities.ProjectEmployee;
 import de.szut.lf8_project.project.services.ProjectEmployeeService;
 import de.szut.lf8_project.project.services.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -223,7 +226,7 @@ public class ProjectController {
     @Operation(summary = "Deletes a project by its unique id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Deleted project"),
-            @ApiResponse(responseCode = "401", description = "Project doesn't contain valid bearer token",
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))}),
             @ApiResponse(responseCode = "404", description = "Project couldn't be found",
@@ -240,15 +243,62 @@ public class ProjectController {
         }
     }
 
+    @Operation(summary = "Adds an Employee to a Project")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Added employee to project"),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "404", description = "Project, Employee or Qualification couldn't be found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})}
+    )
+    @PutMapping("/{id}/add/employee/{employeeId}")
+    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@PathVariable Long id, @PathVariable Long employeeId,
+                                                               @RequestParam String qualification,
+                                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if (!employeeService.isEmployeeOwningCertainQualification(employeeId, qualification, token)) {
+            throw new UnprocessableEntityException(
+                    String.format("The employee with the id '%d' doesn't own the qualification '%s'",
+                            employeeId, qualification)
+            );
+        }
+
+        Project project = projectService.readProjectById(id);
+
+        if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
+            throw new UnprocessableEntityException(String.format("The employee with the id %d is not available in the projects timeslot.",
+                    id));
+        }
+
+        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(id);
+
+        GetProjectDto dto = mappingService.mapProjectToGetProjectDto(
+                projectService.addProjectEmployeeToProject(project, projectEmployee)
+        );
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+     }
+  
     @Operation(summary = "Removes an Employee from a Project")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Removed Employee",
+            @ApiResponse(responseCode = "201", description = "Removed Employee",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "If employee is not involved in project",
-                    content = @Content)}
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))}),
+            @ApiResponse(responseCode = "422", description = "If the state of the employee doesn't match the criteria",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorDetails.class))})
+    }
     )
     @PutMapping("/{id}/remove/employee/{employeeId}")
-    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
+    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId) {
         if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
                 this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
             return new ResponseEntity<>(
@@ -257,8 +307,7 @@ public class ProjectController {
                     ), HttpStatus.OK
             );
         } else {
-            // TODO: Change to 400 after ExceptionHandling
-            throw new ResourceNotFoundException(String.format("The employee %d isn't involved in Project %d.",
+            throw new UnprocessableEntityException(String.format("The employee %d isn't involved in Project %d.",
                     employeeId, id));
         }
     }
