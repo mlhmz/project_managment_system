@@ -1,17 +1,18 @@
 package de.szut.lf8_project.projects;
 
+import de.szut.lf8_project.AuthorizedIT;
 import org.json.JSONObject;
-import org.junit.Test;
-import testcontainers.AbstractIntegrationTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
-import static org.assertj.core.api.Assertions.assertThat;
 
-public class AddNewProjectIT extends AbstractIntegrationTest {
+public class AddNewProjectIT extends AuthorizedIT {
 
     @Test
     public void createProject() throws Exception{
@@ -25,8 +26,9 @@ public class AddNewProjectIT extends AbstractIntegrationTest {
                 }
                 """;
 
-        final var contentAsString = this.mockMvc.perform(post("")
-                .content(content).contentType(MediaType.APPLICATION_JSON))
+        final var contentAsString = this.mockMvc.perform(post("/project")
+                .content(content).contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, fetchJWT()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("responsibleEmployeeId", is("1")))
                 .andExpect(jsonPath("customerId", is("1")))
@@ -40,10 +42,12 @@ public class AddNewProjectIT extends AbstractIntegrationTest {
         final var id = Long.parseLong(new JSONObject(contentAsString).get("id").toString());
 
         final var loadedEntity = projectRepository.findById(id);
-        assertThat(loadedEntity.get().getResponsibleEmployeeId(), is(1));
-        assertThat(loadedEntity.get().getCustomerId().isEqualTo("1"));
-        assertThat(loadedEntity.get().getComment().isEqualTo("This is a new project!"));
-        assertThat(loadedEntity.get().getStartDate().isEqualTo("2022-12-24_12-00-00"));
-        assertThat(loadedEntity.get().getEndDate().isEqualTo("2022-12-27_23-59-59"));
+
+        assertThat(loadedEntity.isPresent(), is(true));
+        assertThat(loadedEntity.get(), hasProperty("id", equalTo(1)));
+        assertThat(loadedEntity.get().getCustomerId(), equalTo("1"));
+        assertThat(loadedEntity.get().getComment(), equalTo("This is a new project!"));
+        assertThat(loadedEntity.get().getStartDate(), equalTo("2022-12-24_12-00-00"));
+        assertThat(loadedEntity.get().getEndDate(), equalTo("2022-12-27_23-59-59"));
     }
 }
