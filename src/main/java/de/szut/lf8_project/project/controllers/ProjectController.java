@@ -3,7 +3,6 @@ package de.szut.lf8_project.project.controllers;
 import de.szut.lf8_project.customer.CustomerService;
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
-import de.szut.lf8_project.employee.QualificationService;
 import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.exceptionHandling.UnprocessableEntityException;
@@ -39,7 +38,7 @@ public class ProjectController {
 
     public ProjectController(ProjectService projectService, ProjectEmployeeService projectEmployeeService,
                              MappingService mappingService,
-                             EmployeeService employeeService) {
+                             EmployeeService employeeService, CustomerService customerService) {
         this.projectService = projectService;
         this.projectEmployeeService = projectEmployeeService;
         this.mappingService = mappingService;
@@ -76,9 +75,17 @@ public class ProjectController {
         Project project = mappingService.mapCreateProjectDtoToProject(dto);
 
         long responsibleEmployeeId = dto.getResponsibleEmployeeId();
+
         if (!employeeService.isEmployeeExisting(responsibleEmployeeId, token)) {
             throw new ResourceNotFoundException(String.format("The employee with the id %d couldn't be found.",
                     responsibleEmployeeId));
+        }
+
+        long customerId = dto.getCustomerId();
+
+        if (!customerService.checkIfCustomerExists(customerId)) {
+            throw new ResourceNotFoundException(String.format("The customer with the id %d couldn't be found.",
+                    customerId));
         }
 
         Project createdProject = projectService.saveProject(project);
