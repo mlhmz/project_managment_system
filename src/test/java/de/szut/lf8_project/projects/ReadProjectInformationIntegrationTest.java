@@ -5,7 +5,6 @@ import de.szut.lf8_project.project.entities.Project;
 import de.szut.lf8_project.project.entities.ProjectEmployee;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -16,8 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class ReadProjectInformationIT extends AuthorizedIT {
+public class ReadProjectInformationIntegrationTest extends AuthorizedIT {
     @Test
     public void readProjectByIdTest() throws Exception {
         Project project = Project.builder()

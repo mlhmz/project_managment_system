@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UpdateProjectIT extends AuthorizedIT {
+public class UpdateProjectIntegrationTest extends AuthorizedIT {
     @Test
     public void updateProject() throws Exception {
         Project project = new Project();
@@ -35,7 +35,7 @@ public class UpdateProjectIT extends AuthorizedIT {
                 }
                 """;
 
-                this.mockMvc.perform(put("/project/1")
+        this.mockMvc.perform(put("/project/1")
                         .content(content).contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, fetchJWT()))
                 .andExpect(status().isOk())

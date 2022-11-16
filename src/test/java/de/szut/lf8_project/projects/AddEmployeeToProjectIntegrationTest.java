@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AddEmployeeToProjectIT extends AuthorizedIT {
+public class AddEmployeeToProjectIntegrationTest extends AuthorizedIT {
 
     @Test
     public void addEmployeeToProject() throws Exception {

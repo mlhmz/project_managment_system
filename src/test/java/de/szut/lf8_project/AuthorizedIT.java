@@ -3,6 +3,7 @@ package de.szut.lf8_project;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +13,7 @@ import testcontainers.AbstractIntegrationTest;
 import java.io.IOException;
 import java.util.Map;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public abstract class AuthorizedIT extends AbstractIntegrationTest {
     private static final String JWT_URL = "https://keycloak.szut.dev/auth/realms/szut/protocol/openid-connect/token";
 

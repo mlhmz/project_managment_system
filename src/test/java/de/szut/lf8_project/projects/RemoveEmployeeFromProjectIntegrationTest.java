@@ -2,20 +2,17 @@ package de.szut.lf8_project.projects;
 
 import de.szut.lf8_project.AuthorizedIT;
 import de.szut.lf8_project.project.entities.Project;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class RemoveEmployeeFromProjectIT extends AuthorizedIT {
+public class RemoveEmployeeFromProjectIntegrationTest extends AuthorizedIT {
 
     @Test
     public void removeEmployeeFromProjectIT() throws Exception{

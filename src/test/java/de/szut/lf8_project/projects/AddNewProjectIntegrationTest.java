@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AddNewProjectIT extends AuthorizedIT {
+public class AddNewProjectIntegrationTest extends AuthorizedIT {
 
     @Test
     public void createProject() throws Exception {
