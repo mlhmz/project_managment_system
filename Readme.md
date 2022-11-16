@@ -12,6 +12,10 @@ http://localhost:8089
 ```
 http://localhost:8089/swagger
 ```
+## Bekannte Bugs
+- LocalDateTimes werden in Swagger im normalen Java-Format angezeigt, haben jedoch eigentlich ein anderes Format
+  - Swaggers Format: e.g. 2022-11-16T17:20:49.688Z
+  - Eigentliches Format (was eingegeben werden muss: 2022-11-16_17_20_49
 
 
 # Postgres
