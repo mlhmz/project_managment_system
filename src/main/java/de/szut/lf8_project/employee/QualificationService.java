@@ -1,11 +1,13 @@
 package de.szut.lf8_project.employee;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class QualificationService {
@@ -17,14 +19,15 @@ public class QualificationService {
     }
 
     public boolean isQualificationExisting(String qualification, String bearerToken) {
-        return Arrays.asList(getAllQualifications(bearerToken)).contains(qualification);
+        GetQualificationDto qualificationDto = new GetQualificationDto(qualification);
+        return getAllQualifications(bearerToken).contains(qualificationDto);
     }
 
-    public String[] getAllQualifications(String bearerToken) {
-        RequestEntity<Void> request = RequestEntity.get(EMPLOYEE_URL)
+    public List<GetQualificationDto> getAllQualifications(String bearerToken) {
+        RequestEntity<?> request = RequestEntity.get(EMPLOYEE_URL)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", bearerToken).build();
 
-        return template.exchange(request, String[].class).getBody();
+        return template.exchange(request, new ParameterizedTypeReference<List<GetQualificationDto>>() {}).getBody();
     }
 }
