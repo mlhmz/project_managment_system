@@ -13,6 +13,6 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Builds
-      - run: mvn -B package --file pom.xml
+        run: mvn -B package --file pom.xml
       - name: Tests
-      - run: mvn -B test --file pom.xml
+        run: mvn -B test --file pom.xml
