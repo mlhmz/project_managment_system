@@ -241,21 +241,21 @@ public class ProjectController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@RequestParam Long projectId, @RequestParam Long employeeId,
+    @PutMapping("/{id}/add/employee/{employeeId)")
+    public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@RequestParam Long id, @RequestParam Long employeeId,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(!employeeService.isEmployeeExisting(employeeId, token)) {
             throw new ResourceNotFoundException(String.format("The Employee with the Id %d couldn't be found", employeeId));
         }
 
-        Project project = projectService.readProjectById(projectId);
+        Project project = projectService.readProjectById(id);
 
         if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
             // TODO: 400?
             throw new RuntimeException("Employee not available in Timeslot");
         }
 
-        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(projectId);
+        ProjectEmployee projectEmployee = mappingService.buildProjectEmployee(id);
 
         GetProjectDto dto = mappingService.mapProjectToGetProjectDto(
                 projectService.addProjectEmployeeToProject(project, projectEmployee)
@@ -272,7 +272,7 @@ public class ProjectController {
                     content = @Content)}
     )
     @PutMapping("/{id}/remove/employee/{employeeId}")
-    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable long employeeId) {
+    public ResponseEntity<GetProjectDto> deleteEmployeeFromProject(@PathVariable Long id, @PathVariable Long employeeId) {
         if (this.projectEmployeeService.isEmployeeInvolvedInProject(id, employeeId) &&
                 this.projectEmployeeService.removeEmployeeFromProject(id, employeeId)) {
             return new ResponseEntity<>(
