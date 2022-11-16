@@ -2,6 +2,7 @@ package de.szut.lf8_project.project.controllers;
 
 import de.szut.lf8_project.employee.EmployeeService;
 import de.szut.lf8_project.employee.GetEmployeeReferencesDto;
+import de.szut.lf8_project.employee.QualificationService;
 import de.szut.lf8_project.exceptionHandling.ErrorDetails;
 import de.szut.lf8_project.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_project.mapping.MappingService;
@@ -247,21 +248,26 @@ public class ProjectController {
             @ApiResponse(responseCode = "401", description = "Request doesn't contain valid bearer token",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))}),
-            @ApiResponse(responseCode = "404", description = "Project or Employee couldn't be found",
+            @ApiResponse(responseCode = "404", description = "Project, Employee or Qualification couldn't be found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorDetails.class))})}
     )
     @PutMapping("/{id}/add/employee/{employeeId}")
     public ResponseEntity<GetProjectDto> addProjectEmployeeToProject(@PathVariable Long id, @PathVariable Long employeeId,
+                                                               @RequestParam String qualification,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(!employeeService.isEmployeeExisting(employeeId, token)) {
-            throw new ResourceNotFoundException(String.format("The Employee with the Id %d couldn't be found", employeeId));
+        if (!employeeService.isEmployeeOwningCertainQualification(employeeId, qualification, token)) {
+            // TODO: 400? Change Message!
+            throw new RuntimeException(
+                    String.format("The employee with the id '%d' doesn't own the qualification '%s'",
+                            employeeId, qualification)
+            );
         }
 
         Project project = projectService.readProjectById(id);
 
         if (!projectEmployeeService.isEmployeeAvailableInTimespan(employeeId, project.getStartDate(), project.getEndDate())) {
-            // TODO: 400?
+            // TODO: 400? Change Message!
             throw new RuntimeException("Employee not available in Timeslot");
         }
 
